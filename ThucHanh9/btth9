@@ -1,0 +1,60 @@
+abstract sig Entry {
+    parent: lone Dir
+}
+
+sig File extends Entry {}
+
+sig Dir extends Entry {}
+
+one sig Root extends Dir {}
+
+fact RootHasNoParent {
+    no Root.parent
+}
+
+fact EveryNonRootHasOneParent {
+    all e: Entry - Root | one e.parent
+}
+
+fact NoSelfParent {
+    all d: Dir | d not in d.parent
+}
+
+fact NoMutualParent {
+    no disj d1, d2: Dir |
+        d1 in d2.parent and d2 in d1.parent
+}
+
+fact NoThreeCycle {
+    no disj d1, d2, d3: Dir |
+        d1 in d2.parent and
+        d2 in d3.parent and
+        d3 in d1.parent
+}
+
+assert EveryFileHasParent {
+    all f: File | one f.parent
+}
+
+assert NoThreeDirectoryCycle {
+    no disj d1, d2, d3: Dir |
+        d1 in d2.parent and
+        d2 in d3.parent and
+        d3 in d1.parent
+}
+
+assert EveryDirectoryHasRootParent {
+    all d: Dir - Root | d.parent = Root
+}
+
+check EveryFileHasParent for 4
+check NoThreeDirectoryCycle for 4
+check EveryDirectoryHasRootParent for 4
+
+check EveryFileHasParent for 5
+check NoThreeDirectoryCycle for 5
+check EveryDirectoryHasRootParent for 5
+
+check EveryFileHasParent for 6
+check NoThreeDirectoryCycle for 6
+check EveryDirectoryHasRootParent for 6
